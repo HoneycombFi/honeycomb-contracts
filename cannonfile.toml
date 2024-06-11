@@ -1,0 +1,19 @@
+name = "based-vault"
+version = "0.1"
+description = "BasedVault integrating with Synthetix V3"
+
+[deploy.based_vault]
+artifact = "BasedVault"
+args = [
+    "<%= settings.assetAddress %>",
+    "<%= settings.synthetixCoreAddress %>",
+    "<%= settings.collateralType %>"
+]
+
+[invoke.initialize]
+target = ["based_vault"]
+from = "<%= settings.owner %>"
+func = "initialize"
+
+[test]
+artifact = "BasedVaultTest"

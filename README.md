@@ -1,66 +1,118 @@
-## Foundry
+# BasedVault
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+BasedVault is a vault contract built on top of the Synthetix V3 protocol, utilizing the ERC-4626 standard for tokenized vaults to simplify . It allows users to stake assets (e.g., USDC) and earn rewards from the Synthetix liquidity pools.
 
-Foundry consists of:
+## Prerequisites
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Node.js
+- Foundry
+- Cannon
 
-## Documentation
+## Installation
 
-https://book.getfoundry.sh/
+1. Install Node.js from [Node.js](https://nodejs.org/).
 
-## Usage
+2. Install Cannon globally:
+    ```sh
+    npm install -g @usecannon/cli
+    ```
+    
+3. Install Foundry:
+    ```sh
+    curl -L https://foundry.paradigm.xyz | bash
+    foundryup
+    ```
 
-### Build
+## Project Setup
 
-```shell
-$ forge build
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/your-repo/basedvault.git
+    cd basedvault
+    ```
+
+2. Initialize the Foundry project:
+    ```sh
+    forge init
+    ```
+
+3. Add Cannon standard library for Foundry:
+    ```sh
+    forge install usecannon/cannon-std
+    ```
+
+4. Create `foundry.toml` file with the following content:
+    ```toml
+    fs_permissions = [{ access = "read", path = "./"}]
+    ```
+
+5. Create `cannonfile.toml` file with the following content:
+    ```toml
+    name = "based-vault"
+    version = "0.1"
+    description = "BasedVault integrating with Synthetix V3"
+
+    [deploy.based_vault]
+    artifact = "BasedVault"
+    args = [
+        "<%= settings.assetAddress %>",
+        "<%= settings.synthetixCoreAddress %>",
+        "<%= settings.collateralType %>"
+    ]
+
+    [invoke.initialize]
+    target = ["based_vault"]
+    from = "<%= settings.owner %>"
+    func = "initialize"
+
+    [test]
+    artifact = "BasedVaultTest"
+    ```
+
+## Deployment
+
+1. Compile the contracts:
+    ```sh
+    cannon build
+    ```
+
+2. Deploy the contracts:
+    ```sh
+    cannon build --network REPLACE_WITH_RPC_ENDPOINT --private-key REPLACE_WITH_KEY_THAT_HAS_GAS_TOKENS
+    ```
+
+## Interaction
+
+1. Run the interaction script:
+    ```sh
+    cannon run scripts/interact.js
+    ```
+
+## Testing
+
+1. Run the tests:
+    ```sh
+    npx cannon test
+    ```
+
+## Directory Structure
+
 ```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+basedvault/
+│
+├── src/
+│   ├── BasedVault.sol
+│   ├── MockERC20.sol
+│   └── MockSynthetixCoreProxy.sol
+│
+├── scripts/
+│   ├── deploy.js
+│   └── interact.js
+│
+├── test/
+│   └── BasedVaultTest.t.sol
+│
+├── cannonfile.toml
+├── foundry.toml
+└── README.md
 ```
