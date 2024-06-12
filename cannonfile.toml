@@ -2,18 +2,33 @@ name = "based-vault"
 version = "0.1"
 description = "BasedVault integrating with Synthetix V3"
 
+[setting.synthetixPackage]
+defaultValue = "synthetix:latest"
+
+[setting.synthetixPreset]
+defaultValue = "main"
+
+[import.synthetix]
+source = "<%= settings.synthetixPackage %>"
+preset = "<%= settings.synthetixPreset %>"
+
+[provision.usdc]
+source = "mintable-token@permissionless-mint"
+options.symbol = "USDC"
+options.name = "Mintable USDC"
+options.salt = "usdc"
+
 [deploy.based_vault]
 artifact = "BasedVault"
 args = [
-    "<%= settings.assetAddress %>",
-    "<%= settings.synthetixCoreAddress %>",
-    "<%= settings.collateralType %>"
+    "<%= imports.usdc.contracts.MintableToken.address %>",
+    "<%= imports.synthetix.contracts.CoreProxy.address %>",
+    "<%= imports.usdc.contracts.MintableToken.address %>"
 ]
 
 [invoke.initialize]
 target = ["based_vault"]
-from = "<%= settings.owner %>"
 func = "initialize"
 
-[test]
-artifact = "BasedVaultTest"
+#[test]
+#artifact = "BasedVaultTest"

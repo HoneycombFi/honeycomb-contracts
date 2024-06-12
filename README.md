@@ -64,25 +64,3 @@ BasedVault is a vault contract built on top of the Synthetix V3 protocol, utiliz
    ```sh
    npx cannon test
    ```
-
-## Directory Structure
-
-```
-basedvault/
-│
-├── src/
-│   ├── BasedVault.sol
-│   ├── MockERC20.sol
-│   └── MockSynthetixCoreProxy.sol
-│
-├── scripts/
-│   ├── deploy.js
-│   └── interact.js
-│
-├── test/
-│   └── BasedVaultTest.t.sol
-│
-├── cannonfile.toml
-├── foundry.toml
-└── README.md
-```
