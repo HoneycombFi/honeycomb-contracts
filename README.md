@@ -51,13 +51,6 @@ BasedVault is a vault contract built on top of the Synthetix V3 protocol, utiliz
    cannon build --network REPLACE_WITH_RPC_ENDPOINT --private-key REPLACE_WITH_KEY_THAT_HAS_GAS_TOKENS
    ```
 
-## Interaction
-
-1. Run the interaction script:
-   ```sh
-   cannon run scripts/interact.js
-   ```
-
 ## Testing
 
 1. Run the tests:
