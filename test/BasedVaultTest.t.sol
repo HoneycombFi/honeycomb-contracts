@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.26;
 
 import "forge-std/Test.sol";
 import "../src/contracts/BasedVault.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../src/contracts/mocks/MockERC20.sol";
+import "../src/contracts/mocks/MockSynthetixCoreProxy.sol";
 
 contract BasedVaultTest is Test {
     BasedVault basedVault;
-    IERC20 usdc;
+    MockERC20 usdc;
     address user;
     address owner;
     address synthetixCore;

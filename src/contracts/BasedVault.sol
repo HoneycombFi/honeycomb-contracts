@@ -1,27 +1,26 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./interfaces/IERC4626.sol";
 import "./interfaces/ISynthetixV3CoreProxy.sol";
 
-contract BasedVault is ERC20, ERC20Permit, ERC20Votes, Ownable, IERC4626 {
+contract BasedVault is ERC20, ERC20Permit, Ownable, IERC4626 {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable asset;
     ISynthetixV3CoreProxy public synthetixCore;
+
     address public collateralType;
     uint128 public accountId;
-
-    mapping(address => uint256) public rewards;
-    uint256 public totalRewards;
     uint128 public preferredPoolId;
+    uint256 public totalRewards;
+    mapping(address => uint256) public rewards;
 
     event Deposit(
         address indexed sender,
@@ -41,7 +40,11 @@ contract BasedVault is ERC20, ERC20Permit, ERC20Votes, Ownable, IERC4626 {
         IERC20 _asset,
         address _synthetixCore,
         address _collateralType
-    ) ERC20("Based Vault Token", "BVT") ERC20Permit("Based Vault Token") {
+    )
+        ERC20("Based Vault Token", "BVT")
+        ERC20Permit("Based Vault Token")
+        Ownable(msg.sender)
+    {
         asset = _asset;
         synthetixCore = ISynthetixV3CoreProxy(_synthetixCore);
         collateralType = _collateralType;

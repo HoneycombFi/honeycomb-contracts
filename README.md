@@ -31,15 +31,11 @@ BasedVault is a vault contract built on top of the Synthetix V3 protocol, utiliz
    cd basedvault
    ```
 
-2. Add Cannon standard library for Foundry:
+2. Add libraries for foundry:
 
    ```sh
    forge install usecannon/cannon-std
-   ```
-
-3. Run npm install
-   ```toml
-   npm install
+   forge install OpenZeppelin/openzeppelin-contracts
    ```
 
 ## Deployment
