@@ -1,6 +1,6 @@
 # BasedVault
 
-BasedVault is a vault contract built on top of the Synthetix V3 protocol, utilizing the ERC-4626 standard for tokenized vaults to simplify . It allows users to stake assets (e.g., USDC) and earn rewards from the Synthetix liquidity pools.
+BasedVault is a vault contract built on top of the Synthetix V3 protocol, utilizing the ERC-4626 standard for tokenized vaults. It allows users to stake assets (e.g., USDC) and earn rewards from the Synthetix liquidity pools.
 
 ## Prerequisites
 
