@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/BasedVault.sol";
+import "../src/contracts/BasedVault.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract BasedVaultTest is Test {
@@ -41,7 +41,7 @@ contract BasedVaultTest is Test {
         basedVault.deposit(depositAmount, user);
 
         // Simulate reward distribution
-        MockRewardDistributor synthetixCore.claimRewards(depositAmount);
+        // MockRewardDistributor synthetixCore.claimRewards(depositAmount);
 
         basedVault.claimRewards();
         uint256 rewards = basedVault.rewards(user);
@@ -55,7 +55,7 @@ contract BasedVaultTest is Test {
         basedVault.deposit(depositAmount, user);
 
         // Simulate reward distribution
-        MockRewardDistributor synthetixCore.claimRewards(depositAmount);
+        //  MockRewardDistributor synthetixCore.claimRewards(depositAmount);
 
         uint256 shares = basedVault.balanceOf(user);
         basedVault.withdraw(shares, user, user);

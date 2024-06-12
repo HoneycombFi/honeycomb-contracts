@@ -13,87 +13,61 @@ BasedVault is a vault contract built on top of the Synthetix V3 protocol, utiliz
 1. Install Node.js from [Node.js](https://nodejs.org/).
 
 2. Install Cannon globally:
-    ```sh
-    npm install -g @usecannon/cli
-    ```
-    
+   ```sh
+   npm install -g @usecannon/cli
+   ```
 3. Install Foundry:
-    ```sh
-    curl -L https://foundry.paradigm.xyz | bash
-    foundryup
-    ```
+   ```sh
+   curl -L https://foundry.paradigm.xyz | bash
+   foundryup
+   ```
 
 ## Project Setup
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/your-repo/basedvault.git
-    cd basedvault
-    ```
 
-2. Initialize the Foundry project:
-    ```sh
-    forge init
-    ```
+   ```sh
+   git clone https://github.com/your-repo/basedvault.git
+   cd basedvault
+   ```
 
-3. Add Cannon standard library for Foundry:
-    ```sh
-    forge install usecannon/cannon-std
-    ```
+2. Add Cannon standard library for Foundry:
 
-4. Create `foundry.toml` file with the following content:
-    ```toml
-    fs_permissions = [{ access = "read", path = "./"}]
-    ```
+   ```sh
+   forge install usecannon/cannon-std
+   ```
 
-5. Create `cannonfile.toml` file with the following content:
-    ```toml
-    name = "based-vault"
-    version = "0.1"
-    description = "BasedVault integrating with Synthetix V3"
-
-    [deploy.based_vault]
-    artifact = "BasedVault"
-    args = [
-        "<%= settings.assetAddress %>",
-        "<%= settings.synthetixCoreAddress %>",
-        "<%= settings.collateralType %>"
-    ]
-
-    [invoke.initialize]
-    target = ["based_vault"]
-    from = "<%= settings.owner %>"
-    func = "initialize"
-
-    [test]
-    artifact = "BasedVaultTest"
-    ```
+3. Run npm install
+   ```toml
+   npm install
+   ```
 
 ## Deployment
 
 1. Compile the contracts:
-    ```sh
-    cannon build
-    ```
+
+   ```sh
+   cannon build
+   ```
 
 2. Deploy the contracts:
-    ```sh
-    cannon build --network REPLACE_WITH_RPC_ENDPOINT --private-key REPLACE_WITH_KEY_THAT_HAS_GAS_TOKENS
-    ```
+   ```sh
+   cannon build --network REPLACE_WITH_RPC_ENDPOINT --private-key REPLACE_WITH_KEY_THAT_HAS_GAS_TOKENS
+   ```
 
 ## Interaction
 
 1. Run the interaction script:
-    ```sh
-    cannon run scripts/interact.js
-    ```
+   ```sh
+   cannon run scripts/interact.js
+   ```
 
 ## Testing
 
 1. Run the tests:
-    ```sh
-    npx cannon test
-    ```
+   ```sh
+   npx cannon test
+   ```
 
 ## Directory Structure
 

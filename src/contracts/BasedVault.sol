@@ -8,48 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IERC4626 {
-    function deposit(
-        uint256 assets,
-        address receiver
-    ) external returns (uint256 shares);
-    function withdraw(
-        uint256 assets,
-        address receiver,
-        address owner
-    ) external returns (uint256 shares);
-    function totalAssets() external view returns (uint256);
-    function convertToShares(uint256 assets) external view returns (uint256);
-    function convertToAssets(uint256 shares) external view returns (uint256);
-}
-
-interface ISynthetixV3CoreProxy {
-    function getPreferredPool() external view returns (uint128);
-    function delegateCollateral(
-        uint128 accountId,
-        uint128 poolId,
-        address collateralType,
-        uint256 newCollateralAmountD18,
-        uint256 leverage
-    ) external;
-    function deposit(
-        uint128 accountId,
-        address collateralType,
-        uint256 tokenAmount
-    ) external;
-    function withdraw(
-        uint128 accountId,
-        address collateralType,
-        uint256 tokenAmount
-    ) external;
-    function createAccount() external returns (uint128);
-    function claimRewards(
-        uint128 accountId,
-        uint128 poolId,
-        address collateralType,
-        address distributor
-    ) external returns (uint256);
-}
+import "./interfaces/IERC4626.sol";
+import "./interfaces/ISynthetixV3CoreProxy.sol";
 
 contract BasedVault is ERC20, ERC20Permit, ERC20Votes, Ownable, IERC4626 {
     using SafeERC20 for IERC20;
