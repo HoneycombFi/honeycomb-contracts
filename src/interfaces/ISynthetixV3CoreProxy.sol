@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 interface ISynthetixV3CoreProxy {
+
     function getPreferredPool() external view returns (uint128);
     function delegateCollateral(
         uint128 accountId,
@@ -8,22 +9,28 @@ interface ISynthetixV3CoreProxy {
         address collateralType,
         uint256 newCollateralAmountD18,
         uint256 leverage
-    ) external;
+    )
+        external;
     function deposit(
         uint128 accountId,
         address collateralType,
         uint256 tokenAmount
-    ) external;
+    )
+        external;
     function withdraw(
         uint128 accountId,
         address collateralType,
         uint256 tokenAmount
-    ) external;
+    )
+        external;
     function createAccount() external returns (uint128);
     function claimRewards(
         uint128 accountId,
         uint128 poolId,
         address collateralType,
         address distributor
-    ) external returns (uint256);
+    )
+        external
+        returns (uint256);
+
 }

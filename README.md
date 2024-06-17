@@ -1,59 +1,43 @@
-# BasedVault
+# Based Vault
 
-BasedVault is a vault contract built on top of the Synthetix V3 protocol, utilizing the ERC-4626 standard for tokenized vaults. It allows users to stake assets (e.g., USDC) and earn rewards from the Synthetix liquidity pools.
+## Foundry
 
-## Prerequisites
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-- Node.js
-- Foundry
-- Cannon
+Foundry consists of:
 
-## Installation
+-   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+-   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+-   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+-   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-1. Install Node.js from [Node.js](https://nodejs.org/).
+## Documentation
 
-2. Install Cannon globally:
-   ```sh
-   npm install -g @usecannon/cli
-   ```
-3. Install Foundry:
-   ```sh
-   curl -L https://foundry.paradigm.xyz | bash
-   foundryup
-   ```
+https://book.getfoundry.sh/
 
-## Project Setup
+## Usage
 
-1. Clone the repository:
+### Build
 
-   ```sh
-   git clone https://github.com/your-repo/basedvault.git
-   cd basedvault
-   ```
+```shell
+$ forge build
+```
 
-2. Add libraries for foundry:
+### Test
 
-   ```sh
-   forge install usecannon/cannon-std
-   forge install OpenZeppelin/openzeppelin-contracts
-   ```
+```shell
+$ forge test
+$ forge test --match-test TEST_NAME
+```
 
-## Deployment
+### Format
 
-1. Compile the contracts:
+```shell
+$ forge fmt
+```
 
-   ```sh
-   cannon build
-   ```
+### Gas Snapshots
 
-2. Deploy the contracts:
-   ```sh
-   cannon build --network REPLACE_WITH_RPC_ENDPOINT --private-key REPLACE_WITH_KEY_THAT_HAS_GAS_TOKENS
-   ```
-
-## Testing
-
-1. Run the tests:
-   ```sh
-   npx cannon test
-   ```
+```shell
+$ forge snapshot
+```
