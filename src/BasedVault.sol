@@ -4,70 +4,56 @@ pragma solidity 0.8.26;
 import {Owned} from "./auth/Owned.sol";
 import {ERC20} from "./tokens/ERC20.sol";
 import {ERC4626} from "./tokens/ERC4626.sol";
+import {StrategyLib} from "./utils/StrategyLib.sol";
 
 /// @title BasedVault
 /// @notice ERC4626 Vault Implementation for Aggregating and Distributing Yield
 contract BasedVault is ERC4626, Owned {
 
     /*//////////////////////////////////////////////////////////////
-                                STRUCTS
-    //////////////////////////////////////////////////////////////*/
-
-    struct Initiate {
-        address[] targets;
-        bytes4[] selectors;
-    }
-
-    struct Sync {
-        address[] targets;
-        bytes4[] selectors;
-    }
-
-    struct Unwind {
-        address[] targets;
-        bytes4[] selectors;
-    }
-
-    struct Strategy {
-        bytes32 name;
-        uint256 genesis;
-        uint256 lastSync;
-        Initiate initiate;
-        Sync sync;
-        Unwind unwind;
-    }
-
-    /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
 
-    Strategy internal strategy;
-    Strategy internal stagedStrategy;
+    StrategyLib.Strategy internal strategy;
+    StrategyLib.Strategy internal stagedStrategy;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCT
     //////////////////////////////////////////////////////////////*/
 
-    struct ConstructorParams {
-        address owner;
-        ERC20 underlying;
-        Strategy strategy;
-    }
+    constructor(
+        address _owner,
+        ERC20 _underlying,
+        StrategyLib.Strategy memory _strategy
+    )
+        Owned(_owner)
+        ERC4626(_underlying, "Based Vault Share", "BVS")
+    {
+        _strategy.genesis = block.timestamp;
+        _strategy.lastSync = 0;
 
-    constructor(ConstructorParams memory _params)
-        Owned(_params.owner)
-        ERC4626(_params.underlying, "Based Vault Share", "BVS")
-    {}
+        strategy = _strategy;
+
+        _initiate();
+    }
 
     /*//////////////////////////////////////////////////////////////
                                INTROSPECT
     //////////////////////////////////////////////////////////////*/
 
-    function getStrategy() external view returns (Strategy memory) {
+    function getStrategy()
+        external
+        view
+        returns (StrategyLib.Strategy memory)
+    {
         return strategy;
     }
 
-    function getStagedStrategy() external view returns (Strategy memory) {
+    function getStagedStrategy()
+        external
+        view
+        returns (StrategyLib.Strategy memory)
+    {
         return stagedStrategy;
     }
 
@@ -129,7 +115,7 @@ contract BasedVault is ERC4626, Owned {
 
     error CommitFailed();
 
-    function stage(Strategy memory _strategy) external onlyOwner {
+    function stage(StrategyLib.Strategy memory _strategy) external onlyOwner {
         _strategy.genesis = block.timestamp;
         _strategy.lastSync = 0;
 
@@ -147,27 +133,6 @@ contract BasedVault is ERC4626, Owned {
         strategy = stagedStrategy;
 
         emit StrategyCommitted(strategy.name);
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                                EXECUTE
-    //////////////////////////////////////////////////////////////*/
-
-    error ExecutionFailed();
-
-    function _execute(
-        address[] memory _targets,
-        bytes4[] memory _selectors,
-        bytes[] memory _args
-    )
-        internal
-    {
-        for (uint256 i = 0; i < _targets.length; i++) {
-            (bool success,) =
-                _targets[i].call(abi.encodePacked(_selectors[i], _args[i]));
-
-            require(success, ExecutionFailed());
-        }
     }
 
 }
