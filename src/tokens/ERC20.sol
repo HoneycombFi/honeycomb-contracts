@@ -4,7 +4,6 @@ pragma solidity 0.8.26;
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
 /// @author Solmate
 /// @author Uniswap
-/// @custom:todo Use custom errors
 contract ERC20 {
 
     /*//////////////////////////////////////////////////////////////
@@ -73,7 +72,7 @@ contract ERC20 {
         balanceOf[msg.sender] -= amount;
 
         // Cannot overflow because the sum of all user
-        // balances can't exceed the max uint256 value.
+        // balances can't exceed the max uint256 value
         unchecked {
             balanceOf[to] += amount;
         }
@@ -91,8 +90,8 @@ contract ERC20 {
         public
         returns (bool)
     {
-        uint256 allowed = allowance[from][msg.sender]; // Saves gas for limited
-            // approvals.
+        // Saves gas for limited approvals
+        uint256 allowed = allowance[from][msg.sender];
 
         if (allowed != type(uint256).max) {
             allowance[from][msg.sender] = allowed - amount;
@@ -101,7 +100,7 @@ contract ERC20 {
         balanceOf[from] -= amount;
 
         // Cannot overflow because the sum of all user
-        // balances can't exceed the max uint256 value.
+        // balances can't exceed the max uint256 value
         unchecked {
             balanceOf[to] += amount;
         }
@@ -119,7 +118,7 @@ contract ERC20 {
         totalSupply += amount;
 
         // Cannot overflow because the sum of all user
-        // balances can't exceed the max uint256 value.
+        // balances can't exceed the max uint256 value
         unchecked {
             balanceOf[to] += amount;
         }
@@ -131,7 +130,7 @@ contract ERC20 {
         balanceOf[from] -= amount;
 
         // Cannot underflow because a user's balance
-        // will never be larger than the total supply.
+        // will never be larger than the total supply
         unchecked {
             totalSupply -= amount;
         }

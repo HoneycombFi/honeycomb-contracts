@@ -3,7 +3,7 @@ pragma solidity 0.8.26;
 
 /// @notice Simple single owner authorization mixin.
 /// @author Solmate
-/// @custom:todo Use custom errors
+/// @author thetalentedtrio.finance
 contract Owned {
 
     /*//////////////////////////////////////////////////////////////
@@ -13,13 +13,19 @@ contract Owned {
     event OwnershipTransferred(address indexed user, address indexed newOwner);
 
     /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
+
+    error Unauthorized();
+
+    /*//////////////////////////////////////////////////////////////
                             OWNERSHIP STORAGE
     //////////////////////////////////////////////////////////////*/
 
     address public owner;
 
     modifier onlyOwner() virtual {
-        require(msg.sender == owner, "UNAUTHORIZED");
+        require(msg.sender == owner, Unauthorized());
 
         _;
     }

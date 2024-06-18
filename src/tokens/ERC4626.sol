@@ -7,8 +7,8 @@ import {ERC20} from "./ERC20.sol";
 
 /// @notice Minimal ERC4626 tokenized Vault implementation.
 /// @author Solmate
+/// @author thetalentedtrio.finance
 /// @custom:todo Prevent ERC4626 inflation attacks
-/// @custom:todo Use custom errors
 contract ERC4626 is ERC20 {
 
     using SafeTransferLib for ERC20;
@@ -32,6 +32,13 @@ contract ERC4626 is ERC20 {
         uint256 assets,
         uint256 shares
     );
+
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
+
+    error ZeroShares();
+    error ZeroAssets();
 
     /*//////////////////////////////////////////////////////////////
                                IMMUTABLES
@@ -60,10 +67,10 @@ contract ERC4626 is ERC20 {
         public
         returns (uint256 shares)
     {
-        // Check for rounding error since we round down in previewDeposit.
-        require((shares = previewDeposit(assets)) != 0, "ZERO_SHARES");
+        // Check for rounding error since we round down in previewDeposit
+        require((shares = previewDeposit(assets)) != 0, ZeroShares());
 
-        // Need to transfer before minting or ERC777s could reenter.
+        // Need to transfer before minting or ERC777s could reenter
         asset.safeTransferFrom(msg.sender, address(this), assets);
 
         _mint(receiver, shares);
@@ -80,10 +87,10 @@ contract ERC4626 is ERC20 {
         public
         returns (uint256 assets)
     {
-        // No need to check for rounding error, previewMint rounds up.
+        // No need to check for rounding error, previewMint rounds up
         assets = previewMint(shares);
 
-        // Need to transfer before minting or ERC777s could reenter.
+        // Need to transfer before minting or ERC777s could reenter
         asset.safeTransferFrom(msg.sender, address(this), assets);
 
         _mint(receiver, shares);
@@ -101,11 +108,11 @@ contract ERC4626 is ERC20 {
         public
         returns (uint256 shares)
     {
-        // No need to check for rounding error, previewWithdraw rounds up.
+        // No need to check for rounding error, previewWithdraw rounds up
         shares = previewWithdraw(assets);
 
         if (msg.sender != owner) {
-            // Saves gas for limited approvals.
+            // Saves gas for limited approvals
             uint256 allowed = allowance[owner][msg.sender];
 
             if (allowed != type(uint256).max) {
@@ -131,7 +138,7 @@ contract ERC4626 is ERC20 {
         returns (uint256 assets)
     {
         if (msg.sender != owner) {
-            // Saves gas for limited approvals.
+            // Saves gas for limited approvals
             uint256 allowed = allowance[owner][msg.sender];
 
             if (allowed != type(uint256).max) {
@@ -139,8 +146,8 @@ contract ERC4626 is ERC20 {
             }
         }
 
-        // Check for rounding error since we round down in previewRedeem.
-        require((assets = previewRedeem(shares)) != 0, "ZERO_ASSETS");
+        // Check for rounding error since we round down in previewRedeem
+        require((assets = previewRedeem(shares)) != 0, ZeroAssets());
 
         beforeWithdraw(assets, shares);
 
@@ -160,14 +167,14 @@ contract ERC4626 is ERC20 {
     }
 
     function convertToShares(uint256 assets) public view returns (uint256) {
-        // Saves an extra SLOAD if totalSupply is non-zero.
+        // Saves an extra SLOAD if totalSupply is non-zero
         uint256 supply = totalSupply;
 
         return supply == 0 ? assets : assets.mulDivDown(supply, totalAssets());
     }
 
     function convertToAssets(uint256 shares) public view returns (uint256) {
-        // Saves an extra SLOAD if totalSupply is non-zero.
+        // Saves an extra SLOAD if totalSupply is non-zero
         uint256 supply = totalSupply;
 
         return supply == 0 ? shares : shares.mulDivDown(totalAssets(), supply);
@@ -178,14 +185,14 @@ contract ERC4626 is ERC20 {
     }
 
     function previewMint(uint256 shares) public view returns (uint256) {
-        // Saves an extra SLOAD if totalSupply is non-zero.
+        // Saves an extra SLOAD if totalSupply is non-zero
         uint256 supply = totalSupply;
 
         return supply == 0 ? shares : shares.mulDivUp(totalAssets(), supply);
     }
 
     function previewWithdraw(uint256 assets) public view returns (uint256) {
-        // Saves an extra SLOAD if totalSupply is non-zero.
+        // Saves an extra SLOAD if totalSupply is non-zero
         uint256 supply = totalSupply;
 
         return supply == 0 ? assets : assets.mulDivUp(supply, totalAssets());

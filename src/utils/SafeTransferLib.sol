@@ -9,8 +9,16 @@ import {ERC20} from "../tokens/ERC20.sol";
 /// @dev Use with caution! Some functions in this library knowingly create dirty
 /// @dev Observe that none of the functions in this library check that a token
 /// has code at all! That responsibility is delegated to the caller.
-/// @custom:todo Use custom errors
 library SafeTransferLib {
+
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
+
+    error EthTransferFailed();
+    error TransferFromFailed();
+    error TransferFailed();
+    error ApproveFailed();
 
     /*//////////////////////////////////////////////////////////////
                              ETH OPERATIONS
@@ -21,11 +29,11 @@ library SafeTransferLib {
 
         /// @solidity memory-safe-assembly
         assembly {
-            // Transfer the ETH and store if it succeeded or not.
+            // Transfer the ETH and store if it succeeded or not
             success := call(gas(), to, amount, 0, 0, 0, 0)
         }
 
-        require(success, "ETH_TRANSFER_FAILED");
+        require(success, EthTransferFailed());
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -44,11 +52,11 @@ library SafeTransferLib {
 
         /// @solidity memory-safe-assembly
         assembly {
-            // Get a pointer to some free memory.
+            // Get a pointer to some free memory
             let freeMemoryPointer := mload(0x40)
 
             // Write the abi-encoded calldata into memory, beginning with the
-            // function selector.
+            // function selector
             mstore(
                 freeMemoryPointer,
                 0x23b872dd00000000000000000000000000000000000000000000000000000000
@@ -56,20 +64,20 @@ library SafeTransferLib {
             mstore(
                 add(freeMemoryPointer, 4),
                 and(from, 0xffffffffffffffffffffffffffffffffffffffff)
-            ) // Append and mask the "from" argument.
+            ) // Append and mask the "from" argument
             mstore(
                 add(freeMemoryPointer, 36),
                 and(to, 0xffffffffffffffffffffffffffffffffffffffff)
             ) // Append and mask the "to" argument.
             mstore(add(freeMemoryPointer, 68), amount) // Append the "amount"
-                // argument. Masking not required as it's a full 32 byte type.
+                // argument. Masking not required as it's a full 32 byte type
 
             success :=
                 and(
-                    // Set success to whether the call reverted, if not we check it
-                    // either
+                    // Set success to whether the call reverted,
+                    // if not we check it either
                     // returned exactly 1 (can't just be non-zero data), or had no
-                    // return data.
+                    // return data
                     or(
                         and(eq(mload(0), 1), gt(returndatasize(), 31)),
                         iszero(returndatasize())
@@ -86,7 +94,7 @@ library SafeTransferLib {
                 )
         }
 
-        require(success, "TRANSFER_FROM_FAILED");
+        require(success, TransferFromFailed());
     }
 
     function safeTransfer(ERC20 token, address to, uint256 amount) internal {
@@ -94,11 +102,11 @@ library SafeTransferLib {
 
         /// @solidity memory-safe-assembly
         assembly {
-            // Get a pointer to some free memory.
+            // Get a pointer to some free memory
             let freeMemoryPointer := mload(0x40)
 
             // Write the abi-encoded calldata into memory, beginning with the
-            // function selector.
+            // function selector
             mstore(
                 freeMemoryPointer,
                 0xa9059cbb00000000000000000000000000000000000000000000000000000000
@@ -106,9 +114,9 @@ library SafeTransferLib {
             mstore(
                 add(freeMemoryPointer, 4),
                 and(to, 0xffffffffffffffffffffffffffffffffffffffff)
-            ) // Append and mask the "to" argument.
+            ) // Append and mask the "to" argument
             mstore(add(freeMemoryPointer, 36), amount) // Append the "amount"
-                // argument. Masking not required as it's a full 32 byte type.
+                // argument. Masking not required as it's a full 32 byte type
 
             success :=
                 and(
@@ -132,7 +140,7 @@ library SafeTransferLib {
                 )
         }
 
-        require(success, "TRANSFER_FAILED");
+        require(success, TransferFailed());
     }
 
     function safeApprove(ERC20 token, address to, uint256 amount) internal {
@@ -140,11 +148,11 @@ library SafeTransferLib {
 
         /// @solidity memory-safe-assembly
         assembly {
-            // Get a pointer to some free memory.
+            // Get a pointer to some free memory
             let freeMemoryPointer := mload(0x40)
 
             // Write the abi-encoded calldata into memory, beginning with the
-            // function selector.
+            // function selector
             mstore(
                 freeMemoryPointer,
                 0x095ea7b300000000000000000000000000000000000000000000000000000000
@@ -152,9 +160,9 @@ library SafeTransferLib {
             mstore(
                 add(freeMemoryPointer, 4),
                 and(to, 0xffffffffffffffffffffffffffffffffffffffff)
-            ) // Append and mask the "to" argument.
+            ) // Append and mask the "to" argument
             mstore(add(freeMemoryPointer, 36), amount) // Append the "amount"
-                // argument. Masking not required as it's a full 32 byte type.
+                // argument. Masking not required as it's a full 32 byte type
 
             success :=
                 and(
@@ -178,7 +186,7 @@ library SafeTransferLib {
                 )
         }
 
-        require(success, "APPROVE_FAILED");
+        require(success, ApproveFailed());
     }
 
 }
