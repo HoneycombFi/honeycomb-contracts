@@ -15,17 +15,17 @@ contract BasedVault is ERC4626, Owned {
 
     struct Initiate {
         address[] targets;
-        bytes[] data;
+        bytes4[] selectors;
     }
 
     struct Sync {
         address[] targets;
-        bytes[] data;
+        bytes4[] selectors;
     }
 
     struct Unwind {
         address[] targets;
-        bytes[] data;
+        bytes4[] selectors;
     }
 
     struct Strategy {
@@ -45,7 +45,7 @@ contract BasedVault is ERC4626, Owned {
     Strategy internal stagedStrategy;
 
     /*//////////////////////////////////////////////////////////////
-                              CONSTRUCTOR
+                               CONSTRUCT
     //////////////////////////////////////////////////////////////*/
 
     struct ConstructorParams {
@@ -60,7 +60,7 @@ contract BasedVault is ERC4626, Owned {
     {}
 
     /*//////////////////////////////////////////////////////////////
-                             INTROSPECTION
+                               INTROSPECT
     //////////////////////////////////////////////////////////////*/
 
     function getStrategy() external view returns (Strategy memory) {
@@ -72,49 +72,52 @@ contract BasedVault is ERC4626, Owned {
     }
 
     /*//////////////////////////////////////////////////////////////
-                              INTERACTIONS
+                                 HOOKS
     //////////////////////////////////////////////////////////////*/
 
-    event StrategyInitiated(bytes32 indexed name);
-    event StrategySynced(bytes32 indexed name);
-    event StrategyUnwound(bytes32 indexed name);
-
-    /// @notice Initiate yield bearing strategy
-    function initiate() external onlyOwner {
-        _initiate();
+    function afterDeposit(uint256, uint256) internal override {
+        sync();
     }
+
+    function beforeWithdraw(uint256 assets, uint256 shares) internal override {
+        unwind(assets, shares);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                INITIATE
+    //////////////////////////////////////////////////////////////*/
+
+    event StrategyInitiated(
+        bytes32 indexed name, uint256 assets, uint256 shares
+    );
 
     function _initiate() internal {
-        _execute({
-            _targets: strategy.initiate.targets,
-            _data: strategy.initiate.data
-        });
+        /// @custom:todo
 
-        emit StrategyInitiated(strategy.name);
+        emit StrategyInitiated(strategy.name, totalAssets(), totalSupply);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                                INTERACT
+    //////////////////////////////////////////////////////////////*/
+
+    event StrategySynced(bytes32 indexed name, uint256 assets, uint256 shares);
+    event StrategyUnwound(bytes32 indexed name, uint256 assets, uint256 shares);
 
     /// @notice Sync the strategy to harvest yield
     /// @dev Can be called by anyone
     function sync() public {
         strategy.lastSync = block.timestamp;
 
-        _execute({_targets: strategy.sync.targets, _data: strategy.sync.data});
+        /// @custom:todo
 
-        emit StrategySynced(strategy.name);
+        emit StrategySynced(strategy.name, totalAssets(), totalSupply);
     }
 
-    /// @notice Unwind the strategy
-    function unwind() external onlyOwner {
-        _unwind();
-    }
+    function unwind(uint256 _assets, uint256 _shares) public {
+        /// @custom:todo
 
-    function _unwind() internal {
-        _execute({
-            _targets: strategy.unwind.targets,
-            _data: strategy.unwind.data
-        });
-
-        emit StrategyUnwound(strategy.name);
+        emit StrategyUnwound(strategy.name, _assets, _shares);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -135,15 +138,13 @@ contract BasedVault is ERC4626, Owned {
         emit StrategyStaged(_strategy.name);
     }
 
-    function commit() external onlyOwner {
+    function commit() external {
         require(
             block.timestamp - stagedStrategy.genesis >= 1 days, CommitFailed()
         );
 
         delete stagedStrategy;
         strategy = stagedStrategy;
-
-        _initiate();
 
         emit StrategyCommitted(strategy.name);
     }
@@ -156,12 +157,15 @@ contract BasedVault is ERC4626, Owned {
 
     function _execute(
         address[] memory _targets,
-        bytes[] memory _data
+        bytes4[] memory _selectors,
+        bytes[] memory _args
     )
         internal
     {
         for (uint256 i = 0; i < _targets.length; i++) {
-            (bool success,) = _targets[i].call(_data[i]);
+            (bool success,) =
+                _targets[i].call(abi.encodePacked(_selectors[i], _args[i]));
+
             require(success, ExecutionFailed());
         }
     }
