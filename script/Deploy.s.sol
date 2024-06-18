@@ -31,7 +31,9 @@ contract Deploy is Script {
 contract DeployLocal is Deploy, Local {
 
     function run() public broadcast {
+        /// @custom:todo
         StrategyLib.Strategy memory strategy;
+
         deploy(OWNER, ERC20(UNDERLYING), strategy);
     }
 
@@ -40,7 +42,9 @@ contract DeployLocal is Deploy, Local {
 contract DeployBase is Deploy, Base {
 
     function run() public broadcast {
+        /// @custom:todo
         StrategyLib.Strategy memory strategy;
+
         deploy(OWNER, ERC20(UNDERLYING), strategy);
     }
 
