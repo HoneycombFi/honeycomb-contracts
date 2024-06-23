@@ -9,6 +9,9 @@ import {ERC20} from "../tokens/ERC20.sol";
 /// @author Apiary
 abstract contract Flower is Owned(msg.sender) {
 
+    /// @custom:todo add events
+    /// @custom:todo add natspec
+
     Hive public immutable HIVE;
     ERC20 public immutable BEE;
 

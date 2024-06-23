@@ -13,6 +13,11 @@ contract Synthetix is
     Flower(Hive(msg.sender), ERC20(Hive(msg.sender).asset()))
 {
 
+    /// @custom:todo add events
+    /// @custom:todo add natspec
+    /// @custom:todo consider harvestSynthetixRewards integration
+    /// @custom:todo consider future Synthetix changes and compatibility
+
     ISynthetix public immutable SYNTHETIX;
     uint128 public immutable PREFERRED_POOL_ID;
 
@@ -65,8 +70,6 @@ contract Synthetix is
             newCollateralAmountD18: withD18,
             leverage: 1
         });
-
-        /// @custom:todo emit event for pollination
     }
 
     /// @notice Conclude pollination and withdraw from the Flower
@@ -110,8 +113,6 @@ contract Synthetix is
 
         // realize the harvest by depositing it into the Hive
         HIVE.deposit(harvested, _for);
-
-        /// @custom:todo emit event for harvest
     }
 
     /// @notice Harvest any rewards accumulated
@@ -155,8 +156,6 @@ contract Synthetix is
 
         // realize the harvested rewards by depositing it into the Hive
         HIVE.deposit(rewards, _for);
-
-        /// @custom:todo emit event for rewards harvest
     }
 
     /// @notice Flower must be ERC-721 compliant

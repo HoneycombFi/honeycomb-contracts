@@ -11,6 +11,16 @@ import {ERC4626} from "./tokens/ERC4626.sol";
 /// @author Apiary
 contract Hive is ERC4626, Owned(msg.sender) {
 
+    /// @custom:todo add events
+    /// @custom:todo add natspec
+    /// @custom:todo consider dropping Flower inheritance;
+    /// maybe include list of callable selectors per Flower
+    /// and restrict to those thus allowing for Flower to be
+    /// significantly more flexible
+    ///
+    /// instead of pollinateFlower/harvestFlower,
+    /// just multicall that does not use delegatecall
+
     error WiltedFlower();
 
     string public constant NAME = "Bee";
@@ -27,7 +37,15 @@ contract Hive is ERC4626, Owned(msg.sender) {
         ERC4626(ERC20(_underlying), NAME, SYMBOL)
     {}
 
-    function pollinate(address _flower) external onlyFlower(_flower) {
+    function addFlower(address _flower) external onlyOwner {
+        flowers[_flower] = true;
+    }
+
+    function removeFlower(address _flower) external onlyOwner {
+        delete flowers[_flower];
+    }
+
+    function pollinateFlower(address _flower) external onlyFlower(_flower) {
         uint256 bees = previewRedeem(maxRedeem(msg.sender));
 
         redeem(bees, address(this), msg.sender);
@@ -37,7 +55,7 @@ contract Hive is ERC4626, Owned(msg.sender) {
         Flower(_flower).pollinate({_for: msg.sender, _with: bees});
     }
 
-    function harvest(address _flower) external onlyFlower(_flower) {
+    function harvestFlower(address _flower) external onlyFlower(_flower) {
         Flower(_flower).harvest(msg.sender);
     }
 
