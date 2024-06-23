@@ -7,7 +7,7 @@ import {ERC20} from "./ERC20.sol";
 
 /// @notice Minimal ERC4626 tokenized Vault implementation.
 /// @author Solmate
-/// @author thetalentedtrio.finance
+/// @author Apiary
 /// @custom:todo Prevent ERC4626 inflation attacks
 contract ERC4626 is ERC20 {
 
@@ -77,7 +77,7 @@ contract ERC4626 is ERC20 {
 
         emit Deposit(msg.sender, receiver, assets, shares);
 
-        afterDeposit(assets, shares);
+        _afterDeposit(assets, shares);
     }
 
     function mint(
@@ -97,7 +97,7 @@ contract ERC4626 is ERC20 {
 
         emit Deposit(msg.sender, receiver, assets, shares);
 
-        afterDeposit(assets, shares);
+        _afterDeposit(assets, shares);
     }
 
     function withdraw(
@@ -120,7 +120,7 @@ contract ERC4626 is ERC20 {
             }
         }
 
-        beforeWithdraw(assets, shares);
+        _beforeWithdraw(assets, shares);
 
         _burn(owner, shares);
 
@@ -149,7 +149,7 @@ contract ERC4626 is ERC20 {
         // Check for rounding error since we round down in previewRedeem
         require((assets = previewRedeem(shares)) != 0, ZeroAssets());
 
-        beforeWithdraw(assets, shares);
+        _beforeWithdraw(assets, shares);
 
         _burn(owner, shares);
 
@@ -226,8 +226,8 @@ contract ERC4626 is ERC20 {
                           INTERNAL HOOKS LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function beforeWithdraw(uint256 assets, uint256 shares) internal virtual {}
+    function _beforeWithdraw(uint256 assets, uint256 shares) internal virtual {}
 
-    function afterDeposit(uint256 assets, uint256 shares) internal virtual {}
+    function _afterDeposit(uint256 assets, uint256 shares) internal virtual {}
 
 }
