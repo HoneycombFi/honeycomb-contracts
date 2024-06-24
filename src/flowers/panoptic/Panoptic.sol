@@ -8,7 +8,23 @@ import {IPanoptic} from "./IPanoptic.sol";
 
 /// @title Panoptic Flower
 /// @author Apiary
-/// @dev Must be deployed by a Hive
-contract Panoptic {
-/// @custom:todo Implement Panoptic Flower
+contract Panoptic is Flower {
+
+    error NotImplemented();
+
+    IPanoptic public immutable PANOPTIC;
+
+    constructor(address _protocol, Hive _hive) Flower(_hive, _hive.asset()) {
+        PANOPTIC = IPanoptic(_protocol);
+        BEE.approve(_protocol, type(uint256).max);
+    }
+
+    function pollinate(address, uint256) external pure override {
+        revert NotImplemented();
+    }
+
+    function harvest(address) external pure override returns (uint256) {
+        revert NotImplemented();
+    }
+
 }

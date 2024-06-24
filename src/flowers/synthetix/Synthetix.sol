@@ -8,10 +8,7 @@ import {ISynthetix} from "./ISynthetix.sol";
 
 /// @title Synthetix Flower
 /// @author Apiary
-/// @dev Must be deployed by a Hive
-contract Synthetix is
-    Flower(Hive(msg.sender), ERC20(Hive(msg.sender).asset()))
-{
+contract Synthetix is Flower {
 
     /// @custom:todo add events
     /// @custom:todo add natspec
@@ -23,7 +20,7 @@ contract Synthetix is
 
     mapping(address => uint128) public protocolAccounts;
 
-    constructor(address _protocol) {
+    constructor(address _protocol, Hive _hive) Flower(_hive, _hive.asset()) {
         SYNTHETIX = ISynthetix(_protocol);
 
         BEE.approve(address(SYNTHETIX), type(uint256).max);
