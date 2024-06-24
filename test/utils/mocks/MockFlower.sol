@@ -6,6 +6,7 @@ import {MockProtocol} from "./MockProtocol.sol";
 
 /// @title Panoptic Flower
 /// @author Apiary
+/// @author Jared Borders
 contract MockFlower is Flower {
 
     MockProtocol public immutable protocol;

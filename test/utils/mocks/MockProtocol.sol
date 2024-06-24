@@ -6,6 +6,7 @@ import {MockToken} from "./MockToken.sol";
 
 /// @title Mock Protocol
 /// @author Apiary
+/// @author Jared Borders
 contract MockProtocol {
 
     mapping(address => uint256) public staked;

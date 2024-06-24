@@ -6,6 +6,7 @@ import {ERC20} from "../../../src/tokens/ERC20.sol";
 /// @notice Mock ERC20 token
 /// @dev Exposed mint/burn functions for testing purposes
 /// @author Apiary
+/// @author Jared Borders
 contract MockToken is ERC20("Mock Token", "MOCK", 18) {
 
     function mint(address _to, uint256 _amount) external {
