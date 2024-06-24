@@ -45,7 +45,7 @@ contract Hive is ERC4626, Owned(msg.sender) {
         delete flowers[_flower];
     }
 
-    function pollinateFlower(address _flower) external onlyFlower(_flower) {
+    function pollinate(address _flower) external onlyFlower(_flower) {
         uint256 bees = previewRedeem(maxRedeem(msg.sender));
 
         redeem(bees, address(this), msg.sender);
@@ -55,7 +55,7 @@ contract Hive is ERC4626, Owned(msg.sender) {
         Flower(_flower).pollinate({_for: msg.sender, _with: bees});
     }
 
-    function harvestFlower(address _flower) external onlyFlower(_flower) {
+    function harvest(address _flower) external onlyFlower(_flower) {
         Flower(_flower).harvest(msg.sender);
     }
 
