@@ -46,7 +46,7 @@ Overall, the Hive and Flower framework provides a structured and secure way to m
 
 See `script/Deploy.s.sol` for an example of how to deploy the Hive and Flower contracts using Foundry.
 
-## 🛠️ Foundry
+### 🛠️ Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
@@ -57,32 +57,30 @@ Foundry consists of:
 -   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
 -   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-## Documentation
+> docs: https://book.getfoundry.sh/
 
-https://book.getfoundry.sh/
+#### Usage
 
-## Usage
-
-### Build
+##### Build
 
 ```shell
 $ forge build
 ```
 
-### Test
+##### Test
 
 ```shell
 $ forge test
 $ forge test --match-test TEST_NAME
 ```
 
-### Format
+##### Format
 
 ```shell
 $ forge fmt
 ```
 
-### Gas Snapshots
+##### Gas Snapshots
 
 ```shell
 $ forge snapshot
