@@ -27,11 +27,11 @@ contract HiveTest is Test {
     }
 
     function test_hive_vault_share_name() public view {
-        assertEq(hive.NAME(), "Bee");
+        assertEq(hive.NAME(), "Honeycomb");
     }
 
     function test_hive_vault_share_symbol() public view {
-        assertEq(hive.SYMBOL(), "BEE");
+        assertEq(hive.SYMBOL(), "COMB");
     }
 
     function test_hive_vault_share_decimals() public view {
@@ -96,7 +96,7 @@ contract HiveTest is Test {
         // add flower to the hive
         hive.addFlower(address(flower));
 
-        // pollinate the flower using beekkeeper's tokens
+        // pollinate the flower using beekeeper's tokens
         hive.pollinate(address(flower));
 
         // check protocol the flower is using staked the tokens
@@ -132,7 +132,7 @@ contract HiveTest is Test {
         // add flower to the hive
         hive.addFlower(address(flower));
 
-        // pollinate the flower using beekkeeper's tokens
+        // pollinate the flower using beekeeper's tokens
         hive.pollinate(address(flower));
 
         // set the protocol's yield
@@ -156,8 +156,11 @@ contract HiveTest is Test {
         // redeem all shares for tokens
         hive.redeem(shares, beekeeper, beekeeper);
 
-        // check the beekeeper has all tokens
+        // check the beekeeper redeemed all tokens
         assertEq(token.balanceOf(beekeeper), harvested);
+
+        // stop prank
+        vm.stopPrank();
     }
 
 }
