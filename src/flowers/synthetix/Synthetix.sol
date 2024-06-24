@@ -8,6 +8,7 @@ import {ISynthetix} from "./ISynthetix.sol";
 
 /// @title Synthetix Flower
 /// @author Apiary
+/// @author Jared Borders
 contract Synthetix is Flower {
 
     /// @custom:todo add events

@@ -8,6 +8,7 @@ import {IPanoptic} from "./IPanoptic.sol";
 
 /// @title Panoptic Flower
 /// @author Apiary
+/// @author Jared Borders
 contract Panoptic is Flower {
 
     error NotImplemented();
