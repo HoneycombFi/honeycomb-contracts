@@ -11,21 +11,28 @@ import {ISynthetix} from "./ISynthetix.sol";
 /// @author Jared Borders
 contract Synthetix is Flower {
 
-    /// @custom:todo add events
-    /// @custom:todo add natspec
-    /// @custom:todo consider harvestSynthetixRewards integration
-    /// @custom:todo consider future Synthetix changes and compatibility
+    uint128 public constant sUSDC_MARKET_ID = 1;
+    uint256 public constant LEVERAGE = 1;
 
-    ISynthetix public immutable SYNTHETIX;
+    ISynthetix public immutable SYNTHETIX_CORE;
+    ISynthetix public immutable SYNTHETIX_SPOT_MARKET;
     uint128 public immutable PREFERRED_POOL_ID;
+    ERC20 public immutable sUSDC;
 
     mapping(address => uint128) public protocolAccounts;
 
-    constructor(address _protocol, Hive _hive) Flower(_hive, _hive.asset()) {
-        SYNTHETIX = ISynthetix(_protocol);
+    constructor(address _core, Hive _hive) Flower(_hive, _hive.asset()) {
+        SYNTHETIX_CORE = ISynthetix(_core);
+        SYNTHETIX_SPOT_MARKET =
+            ISynthetix(0x18141523403e2595D31b22604AcB8Fc06a4CaA61);
+        sUSDC = ERC20(SYNTHETIX_SPOT_MARKET.getSynth(sUSDC_MARKET_ID));
 
-        BEE.approve(address(SYNTHETIX), type(uint256).max);
-        PREFERRED_POOL_ID - SYNTHETIX.getPreferredPool();
+        PREFERRED_POOL_ID = SYNTHETIX_CORE.getPreferredPool();
+
+        BEE.approve(address(SYNTHETIX_CORE), type(uint256).max);
+        BEE.approve(address(SYNTHETIX_SPOT_MARKET), type(uint256).max);
+        sUSDC.approve(address(SYNTHETIX_CORE), type(uint256).max);
+        sUSDC.approve(address(SYNTHETIX_SPOT_MARKET), type(uint256).max);
     }
 
     /// @notice Provide Bees to the Flower for pollination
@@ -44,29 +51,36 @@ contract Synthetix is Flower {
         // transfer Bees to the Flower from the Hive
         BEE.transferFrom(address(HIVE), address(this), _with);
 
+        /// @dev Synthetix expects 18 decimals of precision
+        uint256 withD18 = _with * 10 ** (18 - BEE.decimals());
+
+        // wrap the Bess for the Synthetix Core
+        SYNTHETIX_SPOT_MARKET.wrap({
+            marketId: sUSDC_MARKET_ID,
+            wrapAmount: _with,
+            minAmountReceived: withD18
+        });
+
         // establish Synthetix account for the beekeeper;
         // if none exists, create one and store it
         uint128 accountId = protocolAccounts[_for] == 0
-            ? (protocolAccounts[_for] = SYNTHETIX.createAccount())
+            ? (protocolAccounts[_for] = SYNTHETIX_CORE.createAccount())
             : protocolAccounts[_for];
 
-        // ransfer Bees to the Synthetix Core address as collateral
-        SYNTHETIX.deposit({
+        // transfer Bees to the Synthetix Core address as collateral
+        SYNTHETIX_CORE.deposit({
             accountId: accountId,
-            collateralType: address(BEE),
-            tokenAmount: _with
+            collateralType: address(sUSDC),
+            tokenAmount: withD18
         });
 
-        /// @dev Synthetix expects 18 decimals of precision; adjust accordingly
-        uint256 withD18 = _with * 10 ** (18 - BEE.decimals());
-
         // delegate collateral to the preferred pool
-        SYNTHETIX.delegateCollateral({
+        SYNTHETIX_CORE.delegateCollateral({
             accountId: accountId,
             poolId: PREFERRED_POOL_ID,
-            collateralType: address(BEE),
+            collateralType: address(sUSDC),
             newCollateralAmountD18: withD18,
-            leverage: 1
+            leverage: LEVERAGE
         });
     }
 
@@ -85,7 +99,7 @@ contract Synthetix is Flower {
         uint128 accountId = protocolAccounts[_for];
 
         /// @dev specifying a new collateral amount of zero unwinds the position
-        SYNTHETIX.delegateCollateral({
+        SYNTHETIX_CORE.delegateCollateral({
             accountId: accountId,
             poolId: PREFERRED_POOL_ID,
             collateralType: address(BEE),
@@ -94,13 +108,13 @@ contract Synthetix is Flower {
         });
 
         // determine unwound position's collateral amount
-        (harvested,,) = SYNTHETIX.getAccountCollateral({
+        (harvested,,) = SYNTHETIX_CORE.getAccountCollateral({
             accountId: accountId,
             collateralType: address(BEE)
         });
 
         // withdraw unwound collateral
-        SYNTHETIX.withdraw({
+        SYNTHETIX_CORE.withdraw({
             accountId: accountId,
             collateralType: address(BEE),
             tokenAmount: harvested
@@ -129,7 +143,7 @@ contract Synthetix is Flower {
         address[] memory distributors;
 
         // retrieve claimable rewards and associated distributors
-        (claimableD18, distributors) = SYNTHETIX.updateRewards({
+        (claimableD18, distributors) = SYNTHETIX_CORE.updateRewards({
             poolId: PREFERRED_POOL_ID,
             collateralType: address(BEE),
             accountId: accountId
@@ -141,7 +155,7 @@ contract Synthetix is Flower {
         // claim rewards from each distributor
         /// @dev rewards are automatically transferred to the Flower
         for (uint256 i = 0; i < claimableD18.length; i++) {
-            rewards += SYNTHETIX.claimRewards({
+            rewards += SYNTHETIX_CORE.claimRewards({
                 accountId: accountId,
                 poolId: PREFERRED_POOL_ID,
                 collateralType: address(BEE),

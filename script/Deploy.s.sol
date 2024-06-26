@@ -29,8 +29,11 @@ contract Deploy is Script {
     {
         Hive hive = new Hive(underlying);
 
-        hive.addFlower(address(new Synthetix(synthetix, hive)));
-        hive.addFlower(address(new Panoptic(panoptic, hive)));
+        Synthetix synthetixFlower = new Synthetix(synthetix, hive);
+        Panoptic panopticFlower = new Panoptic(panoptic, hive);
+
+        hive.addFlower(address(synthetixFlower));
+        hive.addFlower(address(panopticFlower));
 
         return address(hive);
     }
@@ -40,7 +43,7 @@ contract Deploy is Script {
 contract DeployBase is Deploy, Base {
 
     function run() public broadcast returns (address hive) {
-        hive = deploy(UNDERLYING, SYNTHETIX, PANOPTIC);
+        hive = deploy(USDC, SYNTHETIX_CORE, PANOPTIC);
     }
 
 }
@@ -48,7 +51,7 @@ contract DeployBase is Deploy, Base {
 contract DeployBaseSepolia is Deploy, BaseSepolia {
 
     function run() public broadcast returns (address hive) {
-        hive = deploy(UNDERLYING, SYNTHETIX, PANOPTIC);
+        hive = deploy(USDC, SYNTHETIX_CORE, PANOPTIC);
     }
 
 }
