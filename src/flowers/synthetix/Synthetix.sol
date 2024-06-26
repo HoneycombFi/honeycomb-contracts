@@ -75,6 +75,8 @@ contract Synthetix is Flower {
         });
 
         // delegate collateral to the preferred pool
+        /// @custom:meb commenting out the following results
+        /// in test_fork_flower_synthetix_pollinate passing
         SYNTHETIX_CORE.delegateCollateral({
             accountId: accountId,
             poolId: PREFERRED_POOL_ID,
