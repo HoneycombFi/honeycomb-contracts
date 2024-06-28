@@ -11,20 +11,53 @@ import {ISynthetix} from "./ISynthetix.sol";
 /// @author Jared Borders
 contract Synthetix is Flower {
 
-    uint128 public constant sUSDC_MARKET_ID = 1;
-    uint256 public constant LEVERAGE = 1;
+    /*//////////////////////////////////////////////////////////////
+                          CONSTANTS/IMMUTABLES
+    //////////////////////////////////////////////////////////////*/
 
+    /// @notice Synthetix sUSDC spot market id
+    uint128 public constant sUSDC_MARKET_ID = 1;
+
+    /// @notice Synthetix collateral leverage amount
+    uint256 public constant LEVERAGE = 1 ether;
+
+    /// @notice Synthetix core proxy
     ISynthetix public immutable SYNTHETIX_CORE;
+
+    /// @notice Synthetix spot market proxy
     ISynthetix public immutable SYNTHETIX_SPOT_MARKET;
+
+    /// @notice Synthetix preferred pool id
     uint128 public immutable PREFERRED_POOL_ID;
+
+    /// @notice Synthetix sUSDC synth
     ERC20 public immutable sUSDC;
 
-    mapping(address => uint128) public protocolAccounts;
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
 
-    constructor(address _core, Hive _hive) Flower(_hive, _hive.asset()) {
+    /// @notice mapping of beekeepers to Synthetix accounts
+    mapping(address beekeeper => uint128 synthetixAccountId) public
+        protocolAccounts;
+
+    /*//////////////////////////////////////////////////////////////
+                              CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Constructs the Synthetix Flower
+    /// @param _core Synthetix core proxy address
+    /// @param _spot Synthetix spot market proxy address
+    /// @param _hive Hive contract address
+    constructor(
+        address _core,
+        address _spot,
+        Hive _hive
+    )
+        Flower(_hive, _hive.asset())
+    {
         SYNTHETIX_CORE = ISynthetix(_core);
-        SYNTHETIX_SPOT_MARKET =
-            ISynthetix(0x18141523403e2595D31b22604AcB8Fc06a4CaA61);
+        SYNTHETIX_SPOT_MARKET = ISynthetix(_spot);
         sUSDC = ERC20(SYNTHETIX_SPOT_MARKET.getSynth(sUSDC_MARKET_ID));
 
         PREFERRED_POOL_ID = SYNTHETIX_CORE.getPreferredPool();
@@ -34,6 +67,10 @@ contract Synthetix is Flower {
         sUSDC.approve(address(SYNTHETIX_CORE), type(uint256).max);
         sUSDC.approve(address(SYNTHETIX_SPOT_MARKET), type(uint256).max);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                               POLLINATE
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice Provide Bees to the Flower for pollination
     /// @dev Bees provided capitalize yield bearing position
@@ -75,16 +112,18 @@ contract Synthetix is Flower {
         });
 
         // delegate collateral to the preferred pool
-        /// @custom:meb commenting out the following results
-        /// in test_fork_flower_synthetix_pollinate passing
         SYNTHETIX_CORE.delegateCollateral({
             accountId: accountId,
             poolId: PREFERRED_POOL_ID,
             collateralType: address(sUSDC),
-            newCollateralAmountD18: withD18,
+            amount: withD18,
             leverage: LEVERAGE
         });
     }
+
+    /*//////////////////////////////////////////////////////////////
+                                HARVEST
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice Conclude pollination and withdraw from the Flower
     /// @dev Throws if the Hive is not the caller
@@ -96,7 +135,7 @@ contract Synthetix is Flower {
         onlyOwner
         returns (uint256 harvested)
     {
-        /// @dev account preserved despite withdrawal;
+        /// @dev account preserved (despite withdrawal);
         /// future pollination won't require minting a new account
         uint128 accountId = protocolAccounts[_for];
 
@@ -104,26 +143,34 @@ contract Synthetix is Flower {
         SYNTHETIX_CORE.delegateCollateral({
             accountId: accountId,
             poolId: PREFERRED_POOL_ID,
-            collateralType: address(BEE),
-            newCollateralAmountD18: 0,
-            leverage: 1
+            collateralType: address(sUSDC),
+            amount: 0,
+            leverage: LEVERAGE
         });
 
         // determine unwound position's collateral amount
-        (harvested,,) = SYNTHETIX_CORE.getAccountCollateral({
+        uint256 availableCollateral = SYNTHETIX_CORE
+            .getAccountAvailableCollateral({
             accountId: accountId,
-            collateralType: address(BEE)
+            collateralType: address(sUSDC)
         });
 
         // withdraw unwound collateral
         SYNTHETIX_CORE.withdraw({
             accountId: accountId,
-            collateralType: address(BEE),
-            tokenAmount: harvested
+            collateralType: address(sUSDC),
+            tokenAmount: availableCollateral
         });
 
-        /// @dev use contract balance to determine final amount harvested
-        harvested = BEE.balanceOf(address(this));
+        // adjust precision back to Bee's decimal representation
+        harvested = availableCollateral / 10 ** (18 - BEE.decimals());
+
+        // unwrap the balance harvested from the Synthetix Core
+        SYNTHETIX_SPOT_MARKET.unwrap({
+            marketId: sUSDC_MARKET_ID,
+            unwrapAmount: availableCollateral,
+            minAmountReceived: harvested
+        });
 
         // realize the harvest by depositing it into the Hive
         HIVE.deposit(harvested, _for);
@@ -171,6 +218,10 @@ contract Synthetix is Flower {
         // realize the harvested rewards by depositing it into the Hive
         HIVE.deposit(rewards, _for);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                            ERC721 RECEIVED
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice Flower must be ERC-721 compliant
     /// @dev Synthetix accounts are represented as ERC-721 tokens
