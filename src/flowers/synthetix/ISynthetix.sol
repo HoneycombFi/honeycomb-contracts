@@ -19,13 +19,12 @@ interface ISynthetix {
     /// @param poolId The id of the pool associated with the position.
     /// @param collateralType The address of the collateral used in the
     /// position.
-    /// @param newCollateralAmountD18 The new amount of collateral delegated in
-    /// the position,
-    /// denominated with 18 decimals of precision.
+    /// @param amount The new amount of collateral delegated in
+    /// the position, denominated with 18 decimals of precision.
     /// @param leverage The new leverage amount used in the position,
     /// denominated with 18 decimals of precision.
     ///
-    /// Requirements:
+    /// @dev requirements:
     ///
     /// - `ERC2771Context._msgSender()` must be the owner of the account, have
     /// the `ADMIN` permission, or have the `DELEGATE` permission.
@@ -39,7 +38,7 @@ interface ISynthetix {
         uint128 accountId,
         uint128 poolId,
         address collateralType,
-        uint256 newCollateralAmountD18,
+        uint256 amount,
         uint256 leverage
     )
         external;
@@ -77,30 +76,22 @@ interface ISynthetix {
     )
         external;
 
-    /// @notice Returns the total values pertaining to account `accountId` for
-    /// `collateralType`.
+    /// @notice Returns the amount of collateral of type `collateralType`
+    /// deposited with account `accountId` that can be withdrawn or delegated to
+    /// pools.
     /// @param accountId The id of the account whose collateral is being
     /// queried.
     /// @param collateralType The address of the collateral type whose amount is
     /// being queried.
-    /// @return totalDeposited The total collateral deposited in the account,
-    /// denominated with 18 decimals of precision.
-    /// @return totalAssigned The amount of collateral in the account that is
-    /// delegated to pools, denominated with 18 decimals of precision.
-    /// @return totalLocked The amount of collateral in the account that cannot
-    /// currently be undelegated from a pool, denominated with 18 decimals of
-    /// precision.
-    function getAccountCollateral(
+    /// @return amountD18 The amount of collateral that is available for
+    /// withdrawal or delegation, denominated with 18 decimals of precision.
+    function getAccountAvailableCollateral(
         uint128 accountId,
         address collateralType
     )
         external
         view
-        returns (
-            uint256 totalDeposited,
-            uint256 totalAssigned,
-            uint256 totalLocked
-        );
+        returns (uint256 amountD18);
 
     /// @notice Allows a user with appropriate permissions to claim rewards
     /// associated with a position.

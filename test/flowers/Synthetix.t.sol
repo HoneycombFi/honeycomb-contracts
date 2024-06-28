@@ -25,7 +25,7 @@ contract SynthetixTest is Test, Base, SynthetixErrors {
 
         hive = new Hive(USDC);
         usdc = hive.asset();
-        flower = new Synthetix(SYNTHETIX_CORE, hive);
+        flower = new Synthetix(SYNTHETIX_CORE, SYNTHETIX_SPOT_MARKET, hive);
         flower.transferOwnership(address(hive));
         hive.addFlower(address(flower));
     }
@@ -45,8 +45,17 @@ contract SynthetixTest is Test, Base, SynthetixErrors {
         hive.pollinate({_flower: address(flower)});
     }
 
-    function test_fork_flower_synthetix_harvest() public {}
-
-    function test_fork_flower_synthetix_harvestSynthetixRewards() public {}
+    function test_fork_flower_synthetix_harvest() public {
+        vm.roll(block.number - 2 days);
+        uint256 minDelagationAmount = 100 ether;
+        deal(address(usdc), address(this), 1000 ether);
+        usdc.approve(address(hive), type(uint256).max);
+        uint256 scaledAmount =
+            minDelagationAmount / (10 ** (18 - usdc.decimals()));
+        hive.deposit({assets: scaledAmount, receiver: address(this)});
+        hive.pollinate({_flower: address(flower)});
+        vm.roll(block.timestamp + 2 days);
+        //hive.harvest({_flower: address(flower)});
+    }
 
 }

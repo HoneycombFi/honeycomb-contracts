@@ -123,5 +123,27 @@ contract SynthetixErrors {
     );
     error InsufficientDelegation(uint256 minDelegation);
     error PrecisionLost(uint256 tokenAmount, uint8 decimals);
+    error InsufficentAvailableCollateral(
+        uint256 amountAvailableForDelegationD18, uint256 amountD18
+    );
+    error NotFundedByPool(uint256 marketId, uint256 poolId);
+    error InvalidLeverage(uint256 leverage);
+    error CapacityLocked(uint256 marketId);
+    error MarketNotFound(uint128 marketId);
+    error InsufficientMarketCollateralDepositable(
+        uint128 marketId, address collateralType, uint256 tokenAmountToDeposit
+    );
+    error InsufficientMarketCollateralWithdrawable(
+        uint128 marketId, address collateralType, uint256 tokenAmountToWithdraw
+    );
+    error InsufficientAccountCollateral(uint256 amount);
+    error InsufficientDebt(int256 currentDebt);
+    error NotEnoughLiquidity(uint128 marketId, uint256 amount);
+    error IncorrectMarketInterface(address market);
+    error DebtShareContractNotSet();
+    error DebtShareSnapshotIdNotSet();
+    error OracleDataRequired();
+    error InvalidPermission(bytes32 permission);
+    error UnprocessableNode(bytes32 nodeId);
 
 }
