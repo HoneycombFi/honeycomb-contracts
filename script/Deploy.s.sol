@@ -20,38 +20,36 @@ contract Deploy is Script {
     }
 
     function deploy(
-        address underlying,
-        address synthetix,
-        address panoptic
+        address underlying
     )
         public
         returns (address)
     {
         Hive hive = new Hive(underlying);
 
-        Synthetix synthetixFlower = new Synthetix(synthetix, hive);
-        Panoptic panopticFlower = new Panoptic(panoptic, hive);
-
-        hive.addFlower(address(synthetixFlower));
-        hive.addFlower(address(panopticFlower));
-
         return address(hive);
     }
 
 }
 
+/// @dev steps to deploy and verify on Base:
+/// (1) load the variables in the .env file via `source .env`
+/// (2) run `forge script script/Deploy.s.sol:DeployBase --rpc-url $BASE_RPC_URL --etherscan-api-key $BASESCAN_API_KEY --broadcast --verify -vvvv`
 contract DeployBase is Deploy, Base {
 
     function run() public broadcast returns (address hive) {
-        hive = deploy(USDC, SYNTHETIX_CORE, PANOPTIC);
+        hive = deploy(USDC);
     }
 
 }
 
+/// @dev steps to deploy and verify on BaseSepolia:
+/// (1) load the variables in the .env file via `source .env`
+/// (2) run `forge script script/Deploy.s.sol:DeployBaseSepolia --rpc-url $BASE_SEPOLIA_RPC_URL --etherscan-api-key $BASESCAN_API_KEY --broadcast --verify -vvvv`
 contract DeployBaseSepolia is Deploy, BaseSepolia {
 
     function run() public broadcast returns (address hive) {
-        hive = deploy(USDC, SYNTHETIX_CORE, PANOPTIC);
+        hive = deploy(USDC);
     }
 
 }
