@@ -64,6 +64,8 @@ contract Synthetix is Flower {
 
         BEE.approve(address(SYNTHETIX_CORE), type(uint256).max);
         BEE.approve(address(SYNTHETIX_SPOT_MARKET), type(uint256).max);
+        BEE.approve(address(HIVE), type(uint256).max);
+
         sUSDC.approve(address(SYNTHETIX_CORE), type(uint256).max);
         sUSDC.approve(address(SYNTHETIX_SPOT_MARKET), type(uint256).max);
     }
@@ -183,9 +185,10 @@ contract Synthetix is Flower {
     /// @return rewards harvested
     function harvestSynthetixRewards(address _for)
         external
-        onlyOwner
         returns (uint256 rewards)
     {
+        require(msg.sender == _for);
+
         uint128 accountId = protocolAccounts[_for];
 
         uint256[] memory claimableD18;
