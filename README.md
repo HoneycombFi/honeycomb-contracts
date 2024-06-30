@@ -1,7 +1,7 @@
 # 🐝 Apiary
 
 <p align="center">
-  <img src="https://github.com/barrasso/based-vault/blob/main/illustrations/system.png" alt="system diagram">
+  <img src="https://github.com/HoneycombFi/honeycomb-contracts/blob/main/illustrations/system.png" alt="system diagram">
 </p>
 
 ## 🧩 Summary
