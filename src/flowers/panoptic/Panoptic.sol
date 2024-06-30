@@ -11,21 +11,59 @@ import {IPanoptic} from "./IPanoptic.sol";
 /// @author Jared Borders
 contract Panoptic is Flower {
 
-    error NotImplemented();
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
 
-    IPanoptic public immutable PANOPTIC;
+    /// @notice mapping of beekeepers to Bees provided for pollination
+    mapping(address beekeeper => uint256 bees) public pollen;
 
-    constructor(address _protocol, Hive _hive) Flower(_hive, _hive.asset()) {
-        PANOPTIC = IPanoptic(_protocol);
-        BEE.approve(_protocol, type(uint256).max);
+    /*//////////////////////////////////////////////////////////////
+                              CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+
+    constructor(Hive _hive) Flower(_hive, _hive.asset()) {
+        BEE.approve(address(HIVE), type(uint256).max);
     }
 
-    function pollinate(address, uint256) external pure override {
-        revert NotImplemented();
+    /*//////////////////////////////////////////////////////////////
+                               POLLINATE
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Provide Bees to the Flower for pollination
+    /// @dev Bees provided capitalize yield bearing position
+    /// @dev Throws if the Hive is not the caller
+    /// @param _for beekeeper whom the Flower associates the resulting position
+    /// @param _with amount of Bees to provide for pollination
+    function pollinate(
+        address _for,
+        uint256 _with
+    )
+        external
+        override
+        onlyOwner
+    {
+        BEE.transferFrom(address(HIVE), address(this), _with);
+        pollen[_for] += _with;
     }
 
-    function harvest(address) external pure override returns (uint256) {
-        revert NotImplemented();
+    /*//////////////////////////////////////////////////////////////
+                                HARVEST
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Conclude pollination and withdraw from the Flower
+    /// @dev Throws if the Hive is not the caller
+    /// @param _for beekeeper whom the account is associated with by the Flower
+    /// @return harvested amount
+    function harvest(address _for)
+        external
+        override
+        onlyOwner
+        returns (uint256 harvested)
+    {
+        harvested = pollen[_for];
+        pollen[_for] = 0;
+        HIVE.deposit(harvested, _for);
     }
 
 }
