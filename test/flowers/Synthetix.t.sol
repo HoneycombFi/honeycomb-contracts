@@ -5,7 +5,6 @@ import {Base} from "../../script/configs/Base.sol";
 import {Hive} from "../../src/Hive.sol";
 import {Synthetix} from "../../src/flowers/synthetix/Synthetix.sol";
 import {ERC20} from "../../src/tokens/ERC20.sol";
-
 import {SynthetixErrors} from "../utils/errors/SynthetixErrors.sol";
 import {Test} from "forge-std/Test.sol";
 
